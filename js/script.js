@@ -205,8 +205,6 @@ function checkCreditCard(cardNumber, zipCode, cvv) {
 // When the form is submitted, perform the validation
 $('form').submit(function (event) {
 
-    event.preventDefault();
-
     // clear warnings and call 3 validation functions
     clearAllWarnings();
     checkEmail($mailInput.val());
@@ -216,5 +214,11 @@ $('form').submit(function (event) {
     // If payment method = credit card call payment validation
     if ($('select#payment').val() === 'credit card') {
         checkCreditCard($ccInput.val(), $zipInput.val(), $cvvInput.val());
+    }
+
+    // If there are warnings on the page, prevent the form from submitting
+    const WarningsOnPage = $('.warning').length;
+    if (WarningsOnPage !== 0) {
+        event.preventDefault();
     }
 });
