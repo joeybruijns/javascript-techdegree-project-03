@@ -1,3 +1,27 @@
+///// Global variables /////
+// T-shirt variables
+const $selectDesign = $('#design');
+const $selectThemeOption = $('#design option').first();
+// Add the Select a T-Shirt Theme message to the Color selection
+$('#color').prepend('<option>Please Select a T-Shirt Theme</option>');
+const $colorOptions = $('#color option');
+
+// Activity variables
+let totalCost = 0;
+const $activitiesSection = $('.activities');
+const $allActivities = $('.activities input[type="checkbox"]');
+
+// Payment variables
+const $selectPaymentOption = $('#payment option').first();
+const $paymentOptions = $('#payment option');
+
+// Validation variables
+const $nameInput = $('#name');
+const $mailInput = $('#mail');
+const $ccInput = $('#cc-num');
+const $zipInput = $('#zip');
+const $cvvInput = $('#cvv');
+
 // Focus on the first text field on page load
 $('#name').focus();
 $('#other-title').hide();
@@ -12,15 +36,8 @@ $('#title').change(function () {
 });
 
 ///// T-Shirt Selection /////
-const $selectDesign = $('#design');
-const $selectThemeOption = $('#design option').first();
+// Hide the 'Select a Theme' option
 $selectThemeOption.attr('hidden', true);
-
-// Add the Select a T-Shirt Theme message to the Color selection
-const $selectShirt = $('<option>Please Select a T-Shirt Theme</option>');
-$('#color').prepend($selectShirt);
-
-const $colorOptions = $('#color option');
 $colorOptions.eq(0).attr('selected', 'selected');
 
 // Hide all color elements initially
@@ -54,11 +71,7 @@ $selectDesign.on('change', function (event) {
 });
 
 ///// Activity Section /////
-let totalCost = 0;
 $(`<h3 class="total-cost">Total cost: ${totalCost}</h3>`).appendTo('.activities');
-
-const $activitiesSection = $('.activities');
-const $allActivities = $('.activities input[type="checkbox"]');
 
 $activitiesSection.on('change', function (event) {
     const $clickedItem = $(event.target);
@@ -92,11 +105,9 @@ $('#paypal').hide();
 $('#bitcoin').hide();
 
 // Hide the Select Payment Method option
-const $selectPaymentOption = $('#payment option').first();
 $selectPaymentOption.attr('hidden', true);
 
 // Select Credit Card by default
-const $paymentOptions = $('#payment option');
 $paymentOptions.eq(1).attr('selected', 'selected');
 
 $('#payment').on('change', function (event) {
@@ -118,88 +129,83 @@ $('#payment').on('change', function (event) {
 });
 
 ///// Form Validation ///////
+function clearAllWarnings() {
+    $('.warning').remove();
+}
+
+// Function for validating name field
+function checkName(name) {
+    const $warning = $('<h3 class="warning">- Enter your name</h3>');
+    if (name !== '') {
+        $($nameInput).css('border', '2px solid #b0d3e2');
+    } else {
+        $($nameInput).css('border', '2px solid red');
+        $('.basic-info').prepend($warning);
+    }
+}
+
+// Function for validating email field
+function checkEmail(email) {
+    const $warning = $('<h3 class="warning">- Enter a valid email</h3>');
+    const check = /^[^@]+@[^@.]+\.[a-z]+$/i.test(email);
+    if (check) {
+        $($mailInput).css('border', '2px solid #b0d3e2');
+    } else {
+        $($mailInput).css('border', '2px solid red');
+        $('.basic-info').prepend($warning);
+    }
+}
+
+// Function for validating activity checkboxes
+function checkActivity() {
+    const $warning = $('<h3 class="warning">- Select an activity</h3>');
+    let counter = 0;
+    $($allActivities).each(function () {
+        if ($(this).prop('checked') === false) {
+            counter += 1;
+        }
+        if (counter === $allActivities.length) {
+            $($activitiesSection).prepend($warning);
+        }
+    });
+}
+
+// Function for validating credit card payment method
+function checkCreditCard(cardNumber, zipCode, cvv) {
+    const $warning = $('<h3 class="warning">- Please, enter a valid credit card</h3>');
+
+    const cardCheck = /^\d{13,16}$/.test(cardNumber);
+    const zipCheck = /^\d{5}$/.test(zipCode);
+    const cvvCheck = /^\d{3}$/.test(cvv);
+
+    function printErrorMessage() {
+        $($warning).insertAfter('#payment');
+    }
+
+    if (cardCheck) {
+        $($ccInput).css('border', '2px solid #b0d3e2');
+    } else {
+        $($ccInput).css('border', '2px solid red');
+        printErrorMessage();
+    }
+    if (zipCheck) {
+        $($zipInput).css('border', '2px solid #b0d3e2');
+    } else {
+        $($zipInput).css('border', '2px solid red');
+        printErrorMessage();
+    }
+    if (cvvCheck) {
+        $($cvvInput).css('border', '2px solid #b0d3e2');
+    } else {
+        $($cvvInput).css('border', '2px solid red');
+        printErrorMessage();
+    }
+}
+
 // When the form is submitted, perform the validation
 $('form').submit(function (event) {
-    const $nameInput = $('#name');
-    const $mailInput = $('#mail');
-    const $ccInput = $('#cc-num');
-    const $zipInput = $('#zip');
-    const $cvvInput = $('#cvv');
 
     event.preventDefault();
-
-    function clearAllWarnings() {
-        $('.warning').remove();
-    }
-
-    // Function for validating name field
-    function checkName(name) {
-        const $warning = $('<h3 class="warning">- Enter your name</h3>');
-        if (name !== '') {
-            $($nameInput).css('border', '2px solid #b0d3e2');
-        } else {
-            $($nameInput).css('border', '2px solid red');
-            $('.basic-info').prepend($warning);
-        }
-    }
-
-    // Function for validating email field
-    function checkEmail(email) {
-        const $warning = $('<h3 class="warning">- Enter a valid email</h3>');
-        const check = /^[^@]+@[^@.]+\.[a-z]+$/i.test(email);
-        if (check) {
-            $($mailInput).css('border', '2px solid #b0d3e2');
-        } else {
-            $($mailInput).css('border', '2px solid red');
-            $('.basic-info').prepend($warning);
-        }
-    }
-
-    // Function for validating activity checkboxes
-    function checkActivity() {
-        const $warning = $('<h3 class="warning">- Select an activity</h3>');
-        let counter = 0;
-        $($allActivities).each(function () {
-            if ($(this).prop('checked') === false) {
-                counter += 1;
-            }
-            if (counter === $allActivities.length) {
-                $($activitiesSection).prepend($warning);
-            }
-        });
-    }
-
-    // Function for validating credit card payment method
-    function checkCreditCard(cardNumber, zipCode, cvv) {
-        const $warning = $('<h3 class="warning">- Please, enter a valid credit card</h3>');
-
-        const cardCheck = /^\d{13,16}$/.test(cardNumber);
-        const zipCheck = /^\d{5}$/.test(zipCode);
-        const cvvCheck = /^\d{3}$/.test(cvv);
-
-        function printErrorMessage() {
-            $($warning).insertAfter('#payment');
-        }
-
-        if (cardCheck) {
-            $($ccInput).css('border', '2px solid #b0d3e2');
-        } else {
-            $($ccInput).css('border', '2px solid red');
-            printErrorMessage();
-        }
-        if (zipCheck) {
-            $($zipInput).css('border', '2px solid #b0d3e2');
-        } else {
-            $($zipInput).css('border', '2px solid red');
-            printErrorMessage();
-        }
-        if (cvvCheck) {
-            $($cvvInput).css('border', '2px solid #b0d3e2');
-        } else {
-            $($cvvInput).css('border', '2px solid red');
-            printErrorMessage();
-        }
-    }
 
     // clear warnings and call 3 validation functions
     clearAllWarnings();
